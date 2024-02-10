@@ -1,0 +1,30 @@
+const router = require('express').Router();
+const { NotFoundErr } = require('../errors/NotFoundErr');
+const { signup, signin } = require('../controllers/users');
+
+const {
+  signUp,
+  signIn,
+} = require('../validation/validation');
+
+const auth = require('../middlewares/auth');
+
+router.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
+
+router.post('/signup', signUp, signup);
+router.post('/signin', signIn, signin);
+
+router.use(auth);
+
+router.use('/', require('./users'));
+router.use('/', require('./movies'));
+
+router.use((req, res, next) => {
+  next(new NotFoundErr('Страница не найдена'));
+});
+
+module.exports = router;
